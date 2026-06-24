@@ -1,0 +1,14 @@
+{
+  "ignore": [
+    "mongodb_data/*",
+    "mongodb_data/**/*",
+    "**/mongodb_data/**",
+    "**/mf_cache.json",
+    "server/mongodb_data/*",
+    "*mongodb_data*",
+    "*mf_cache.json",
+    "F:\\VS\\finbuddy\\server\\mongodb_data\\*",
+    "F:\\VS\\finbuddy\\server\\mongodb_data\\mf_cache.json",
+    "F:/VS/finbuddy/server/mongodb_data/*"
+  ]
+}

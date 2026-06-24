@@ -1,0 +1,605 @@
+/* ====================================================================
+   LAB ANIMATIONS — Centralized Keyframe Registry for All Lesson Engines
+   Every @keyframe previously inline in <style> tags now lives here.
+   Import once in LabPage.jsx. Never duplicate keyframes again.
+   ==================================================================== */
+
+/* ── 1. ENTRANCE ── */
+@keyframes lab-entrance {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0px) scale(1); }
+}
+@keyframes lab-entrance-fast {
+  from { opacity: 0; transform: translateY(4px) scale(0.99); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── 2. AMBIENT GLOW / PULSE ── */
+@keyframes lab-orb-pulse {
+  0%, 100% { transform: scale(0.88); opacity: 0.18; }
+  50%       { transform: scale(1.18); opacity: 0.65; }
+}
+@keyframes lab-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+  50%       { filter: drop-shadow(0 0 18px currentColor); }
+}
+@keyframes lab-ambient-breathe {
+  0%, 100% { opacity: 0.08; }
+  50%       { opacity: 0.22; }
+}
+@keyframes lab-shield-pulse {
+  0%, 100% { stroke-opacity: 0.35; transform: scale(1.0); }
+  50%       { stroke-opacity: 1;    transform: scale(1.09); }
+}
+@keyframes lab-pulse-ring {
+  0%   { transform: scale(0.92); opacity: 0.8; }
+  50%  { transform: scale(1.12); opacity: 0.3; }
+  100% { transform: scale(0.92); opacity: 0.8; }
+}
+
+/* ── 3. ROTATIONS ── */
+@keyframes lab-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes lab-spin-reverse {
+  to { transform: rotate(-360deg); }
+}
+@keyframes lab-spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes lab-spin-sgb {
+  to { transform: rotate(360deg); }
+}
+@keyframes spin-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 4. FLOW / DASH ANIMATIONS ── */
+@keyframes lab-flow {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes lab-flow-rev {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 24; }
+}
+@keyframes lab-flow-fast {
+  from { stroke-dashoffset: 14; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes lab-dash-march {
+  to { stroke-dashoffset: -36; }
+}
+@keyframes lab-barter-flow {
+  from { stroke-dashoffset: 20; }
+  to   { stroke-dashoffset: 0; }
+}
+/* Compatibility aliases */
+@keyframes flow {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes flow-fast {
+  from { stroke-dashoffset: 14; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes flow-barter {
+  from { stroke-dashoffset: 20; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes flow-line {
+  to { stroke-dashoffset: -36; }
+}
+
+/* ── 5. NODE / PARTICLE ── */
+@keyframes lab-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-3.5px); }
+}
+@keyframes lab-float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+@keyframes lab-bounce-node {
+  0%, 45%, 55%, 100% { transform: translateY(0); }
+  50%                 { transform: translateY(-4px); }
+}
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-2.5px); }
+}
+
+/* ── 6. LIQUID / CYLINDER ── */
+@keyframes lab-liquid-wave {
+  0%   { border-radius: 54% 46% 45% 55% / 44% 56% 44% 56%; }
+  33%  { border-radius: 46% 54% 55% 45% / 56% 44% 56% 44%; }
+  66%  { border-radius: 50% 50% 46% 54% / 50% 48% 52% 50%; }
+  100% { border-radius: 54% 46% 45% 55% / 44% 56% 44% 56%; }
+}
+@keyframes lab-bubble-rise {
+  0%   { transform: translateY(0px) scale(1); opacity: 0.7; }
+  100% { transform: translateY(-22px) scale(0.5); opacity: 0; }
+}
+@keyframes lab-meniscus {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  50%       { transform: scaleX(1.03) scaleY(0.85); }
+}
+
+/* ── 7. DRIP / DROP ── */
+@keyframes drip {
+  0%   { transform: translateY(0) scale(0.8); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(28px) scale(0.45); opacity: 0; }
+}
+
+/* ── 8. DIGITAL PAYMENTS ── */
+@keyframes travel-p2s {
+  0%        { offset-distance: 0%;   opacity: 0; }
+  5%        { opacity: 1; }
+  30%       { offset-distance: 100%; opacity: 1; }
+  32%, 100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes travel-s2m {
+  0%, 30%   { offset-distance: 0%;   opacity: 0; }
+  30%       { opacity: 1; }
+  60%       { offset-distance: 100%; opacity: 1; }
+  62%, 100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes travel-m2p {
+  0%, 60%   { offset-distance: 0%;   opacity: 0; }
+  60%       { opacity: 1; }
+  90%       { offset-distance: 100%; opacity: 1; }
+  92%, 100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* ── 9. STATUS OVERLAY TEXT ── */
+@keyframes text-init {
+  0%, 28%   { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+@keyframes text-route {
+  0%, 28%   { opacity: 0; }
+  30%, 58%  { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+@keyframes text-settle {
+  0%, 58%   { opacity: 0; }
+  60%, 88%  { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+@keyframes text-success {
+  0%, 88%   { opacity: 0; }
+  90%, 98%  { opacity: 1; }
+  100%      { opacity: 0; }
+}
+@keyframes success-glow {
+  0%, 59%  { opacity: 0; transform: scale(0.7); }
+  60%      { opacity: 1; transform: scale(1.2); }
+  65%      { transform: scale(1); }
+  85%      { opacity: 1; }
+  90%, 100%{ opacity: 0; }
+}
+
+/* ── 10. LASER / CRISIS ── */
+@keyframes laser-pulse {
+  0%, 100%{ stroke-width: 1.5px; stroke-opacity: 0.6; }
+  50%      { stroke-width: 3px;   stroke-opacity: 1; }
+}
+@keyframes pulse-error {
+  0%, 100%{ opacity: 0.28; }
+  50%      { opacity: 0.95; }
+}
+@keyframes pulse-active {
+  0%, 100% {
+    stroke-opacity: 0.6;
+    stroke-width: 1.5px;
+    filter: drop-shadow(0 0 1px rgba(249,115,22,0.3));
+  }
+  50% {
+    stroke-opacity: 1;
+    stroke-width: 2.5px;
+    filter: drop-shadow(0 0 5px rgba(249,115,22,0.8));
+  }
+}
+@keyframes pulse-node {
+  0%, 100%{ filter: drop-shadow(0 0 3px rgba(34,211,238,0.3)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(34,211,238,0.75)); }
+}
+
+/* ── 11. SHAKE / WOBBLE ── */
+@keyframes shake {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(0.9deg); }
+  50%  { transform: rotate(0deg); }
+  75%  { transform: rotate(-0.9deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes lab-needle-swing {
+  0%   { transform: rotate(-4deg); }
+  50%  { transform: rotate(4deg); }
+  100% { transform: rotate(-4deg); }
+}
+
+/* ── 12. SHIMMER (SGB Coin + Scan-line) ── */
+@keyframes lab-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes lab-scan-line {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: 0.25; }
+  90%  { opacity: 0.25; }
+  100% { transform: translateY(600%);  opacity: 0; }
+}
+@keyframes lab-gold-shimmer {
+  0%   { background-position: -300% center; opacity: 0.55; }
+  50%  { opacity: 0.85; }
+  100% { background-position: 300% center; opacity: 0.55; }
+}
+
+/* ── 13. TICKER ── */
+@keyframes lab-ticker {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(-100%); }
+}
+
+/* ── 14. SNOWBALL ── */
+@keyframes root-pulse {
+  0%   { transform: scale(0.88); opacity: 0.22; }
+  50%  { transform: scale(1.12); opacity: 0.62; }
+  100% { transform: scale(0.88); opacity: 0.22; }
+}
+
+/* ── 15. BLOCKCHAIN ── */
+@keyframes vote-travel {
+  0%        { opacity: 0; transform: translate(0,0) scale(0.5); }
+  15%       { opacity: 1; transform: scale(1); }
+  75%       { opacity: 1; }
+  90%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.7); }
+}
+@keyframes shield-pulse {
+  0%, 100% { stroke-opacity: 0.35; transform: scale(1.0); }
+  50%       { stroke-opacity: 1;    transform: scale(1.09); }
+}
+
+/* ── 16. WAVE / PULSE (voice oscilloscope) ── */
+@keyframes wave-pulse {
+  0%, 100% { height: 8px; opacity: 0.5; }
+  50%       { height: 20px; opacity: 1; }
+}
+
+/* ====================================================================
+   UTILITY CLASSES
+   ==================================================================== */
+
+.lab-visual-enter      { animation: lab-entrance 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lab-visual-enter-fast { animation: lab-entrance-fast 0.22s ease-out both; }
+
+.lab-flow       { animation: lab-flow 1.4s linear infinite; }
+.lab-flow-fast  { animation: lab-flow-fast 0.7s linear infinite; }
+.lab-flow-rev   { animation: lab-flow-rev 1.4s linear infinite; }
+
+/* Legacy compat classes (existing JSX references these names) */
+.animate-flow-fast { stroke-dasharray: 6, 12; animation: flow-line 1.2s linear infinite; }
+.animate-flow-slow { stroke-dasharray: 6, 12; animation: flow-line 3s linear infinite; }
+.active-canister   { animation: pulse-active 1.5s infinite ease-in-out; }
+
+.lab-node-float  { animation: lab-float 3s ease-in-out infinite; }
+.lab-node-bounce { animation: lab-bounce-node 3.5s ease-in-out infinite; }
+
+.lab-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 300% 100%;
+  animation: lab-shimmer 2.8s ease-in-out infinite;
+}
+.lab-gold-shimmer {
+  background: linear-gradient(90deg,
+    rgba(245,158,11,0) 0%,
+    rgba(253,230,138,0.55) 40%,
+    rgba(255,255,255,0.85) 50%,
+    rgba(253,230,138,0.55) 60%,
+    rgba(245,158,11,0) 100%
+  );
+  background-size: 300% 100%;
+  animation: lab-gold-shimmer 2.2s ease-in-out infinite;
+}
+
+.lab-bubble { animation: lab-bubble-rise 1.8s ease-out infinite; }
+.lab-liquid-surface { animation: lab-liquid-wave 3s ease-in-out infinite; }
+
+.coin-p2s {
+  offset-path: path('M 21 45 Q 32 32 43 25');
+  animation-name: travel-p2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.coin-s2m {
+  offset-path: path('M 57 25 Q 68 32 78 45');
+  animation-name: travel-s2m;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.confirm-m2p {
+  offset-path: path('M 78 52 Q 50 66 22 52');
+  animation-name: travel-m2p;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+/* ── EDUCATIONAL ENGINE ADDITIONS ── */
+/* Fee-drip animation for active_passive engine */
+@keyframes lab-drip-down {
+  0%   { transform: translateY(0px) scaleY(1); opacity: 0.7; }
+  60%  { transform: translateY(6px) scaleY(1.4); opacity: 0.5; }
+  80%  { transform: translateY(10px) scaleY(0.8); opacity: 0.3; }
+  100% { transform: translateY(14px) scaleY(0.3); opacity: 0; }
+}
+/* Dot pulse helper for status indicators */
+@keyframes lab-orb-pulse-indicator {
+  0%, 100% { transform: scale(0.75); opacity: 0.4; }
+  50%       { transform: scale(1.3);  opacity: 1; }
+}
+.lab-status-dot { animation: lab-orb-pulse-indicator 1.2s ease-in-out infinite; }
+
+/* Consolidated from inline style tags in LabPage.jsx */
+
+/* 1. Physics scale swing (for renderAllocationEngine) */
+@keyframes beam-swing {
+  0%, 100% { transform: rotate(calc(-4deg - var(--swing))); }
+  50% { transform: rotate(calc(-4deg + var(--swing))); }
+}
+@keyframes tray-swing-left {
+  0%, 100% { transform: rotate(calc(4deg + var(--swing))); }
+  50% { transform: rotate(calc(4deg - var(--swing))); }
+}
+@keyframes tray-swing-right {
+  0%, 100% { transform: rotate(calc(4deg + var(--swing))); }
+  50% { transform: rotate(calc(4deg - var(--swing))); }
+}
+@keyframes eq-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-0.8px, -0.5px); }
+  75% { transform: translate(0.8px, 0.5px); }
+}
+
+/* 2. Basket shake (for renderAllocationEngine -> diversify) */
+@keyframes shake-basket {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-1.5px, 0.5px) rotate(-3deg); }
+  40% { transform: translate(1px, -0.5px) rotate(2deg); }
+  60% { transform: translate(-1.5px, -0.5px) rotate(-3deg); }
+  80% { transform: translate(1px, 0.5px) rotate(2deg); }
+}
+.animate-shake-basket {
+  animation: shake-basket 0.4s ease-in-out infinite;
+}
+
+/* 3. Emergency vault waves & bubbles (for renderVaultEngine -> emergency) */
+@keyframes wave-slide-1 {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-40px); }
+}
+@keyframes wave-slide-2 {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(40px); }
+}
+@keyframes bubble-rise-1 {
+  0% { transform: translateY(80px) scale(0.6); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(0px) scale(1); opacity: 0; }
+}
+@keyframes bubble-rise-2 {
+  0% { transform: translateY(80px) scale(0.8); opacity: 0; }
+  10% { opacity: 0.7; }
+  70% { opacity: 0.7; }
+  100% { transform: translateY(10px) scale(0.4); opacity: 0; }
+}
+@keyframes storm-shield-pulse {
+  0%, 100% { transform: scale(1.08); opacity: 0.4; stroke-width: 1.5; }
+  50% { transform: scale(1.15); opacity: 0.9; stroke-width: 3; }
+}
+@keyframes core-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.95; }
+}
+
+/* 4. Tax pipelines (for renderVaultEngine -> tax_80c) */
+@keyframes flow-tax {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 15; }
+}
+@keyframes flow-save {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -15; }
+}
+
+/* 5. Deficit pulse (for renderVaultEngine -> budget) */
+@keyframes pulse-deficit {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+/* 6. Savings rate orbit (for renderVaultEngine -> savings_rate) */
+@keyframes orbit-sr {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes dial-pulse-sr {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}
+
+/* 7. Credit score dial pulse (for renderForensicEngine -> credit_score) */
+@keyframes pulse-glow-forensic {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* 8. Forensics Red Flags Radar & scan lines */
+@keyframes sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes scan-line-auditor {
+  0% { transform: translateY(-30px); opacity: 0.1; }
+  50% { opacity: 1; }
+  100% { transform: translateY(30px); opacity: 0.1; }
+}
+
+/* 9. Viewport Scanline Hazard Overlay */
+@keyframes scanline {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+/* 10. Voice debate listening waveform pulse */
+@keyframes wave-pulse-mic {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+/* 11. Celebration Spinning Coin & Modal Fade-ins */
+@keyframes spin-coin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleUp {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ── NEW PREMIUM INTERACTIVE SIMULATION KEYFRAMES ── */
+/* Conveyor Belt run animation */
+@keyframes conveyor-run {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -20; }
+}
+
+/* Credit risk bridge cracking & shaking */
+@keyframes bridge-shake {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-0.5px) rotate(-0.2deg); }
+  75% { transform: translateY(0.5px) rotate(0.2deg); }
+}
+@keyframes bridge-collapse-left {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(35deg); transform-origin: left bottom; }
+}
+@keyframes bridge-collapse-right {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-35deg); transform-origin: right bottom; }
+}
+
+/* Crane swing & chains breaking */
+@keyframes crane-swing {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+@keyframes block-fall {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(70px); }
+}
+@keyframes chains-break-left {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-20px, 30px) rotate(-60deg); opacity: 0; }
+}
+@keyframes chains-break-right {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(20px, 30px) rotate(60deg); opacity: 0; }
+}
+
+/* Related Party Transactions flow */
+@keyframes rpt-cash-flow {
+  0% { stroke-dashoffset: 20; opacity: 0.1; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.1; }
+}
+
+
+/* Boardroom Escape papers flying */
+@keyframes paper-flutter-1 {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  50% { transform: translate(15px, -15px) rotate(180deg) scale(0.8); }
+  100% { transform: translate(30px, -5px) rotate(360deg) scale(0.5); opacity: 0; }
+}
+@keyframes paper-flutter-2 {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  50% { transform: translate(20px, -8px) rotate(-120deg) scale(0.8); }
+  100% { transform: translate(45px, -15px) rotate(-240deg) scale(0.5); opacity: 0; }
+}
+
+.deficit-glow {
+  animation: pulse-deficit 1.5s infinite ease-in-out;
+}
+
+/* ── 17. WINDING ROAD / MAP ANIMATIONS ── */
+@keyframes roadFlow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.road-bg-pattern {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+.road-path-flow {
+  stroke-dasharray: 8 6;
+  animation: roadFlow 2s linear infinite;
+}
+.node-3d {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.node-3d:active {
+  transform: translateY(4px) scale(0.95) !important;
+}
+
+/* ── 18. CONCEPT WEB ANIMATIONS ── */
+@keyframes concept-node-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.concept-node-enter {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: concept-node-enter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.concept-node-delay-1 { animation-delay: 0.05s; }
+.concept-node-delay-2 { animation-delay: 0.15s; }
+.concept-node-delay-3 { animation-delay: 0.25s; }
+.concept-node-delay-4 { animation-delay: 0.35s; }
+.concept-node-delay-5 { animation-delay: 0.45s; }
+
+.concept-line-flow {
+  stroke-dasharray: 6 6;
+  animation: roadFlow 4s linear infinite;
+  opacity: 0;
+}
+@keyframes line-fade-in {
+  to { opacity: 0.85; }
+}
+.concept-line-enter {
+  animation: line-fade-in 0.8s ease forwards;
+}
+.concept-line-delay-1 { animation-delay: 0.1s; }
+.concept-line-delay-2 { animation-delay: 0.25s; }
+.concept-line-delay-3 { animation-delay: 0.4s; }
+.concept-line-delay-4 { animation-delay: 0.55s; }
+

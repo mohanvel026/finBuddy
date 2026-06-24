@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Neon Cyan-Blue Gradient representing Finance & Tech -->
+    <linearGradient id="cyanGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="60%" stop-color="#4facfe"/>
+      <stop offset="100%" stop-color="#0000ff"/>
+    </linearGradient>
+    
+    <!-- Neon Pink-Violet Gradient representing Social Bonding & Partnership -->
+    <linearGradient id="violetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff0844"/>
+      <stop offset="50%" stop-color="#ffb199"/>
+      <stop offset="100%" stop-color="#8800ff"/>
+    </linearGradient>
+
+    <!-- Neon Glow Filter -->
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Transparent background. Scaled and centered logo for maximum visibility at small favicon sizes -->
+  <g transform="translate(56, 56)" filter="url(#neonGlow)">
+    <!-- Background branding circle path -->
+    <circle cx="200" cy="200" r="150" fill="none" stroke="url(#cyanGrad)" stroke-width="12" opacity="0.15"/>
+
+    <!-- Interlocking Ascending Growth Ribbon (Cyan Loop) -->
+    <path d="M 100,280 C 130,220 170,160 220,120 C 260,88 320,100 320,160 C 320,220 250,260 200,200 C 170,160 150,110 200,80 C 240,50 300,60 300,120" 
+          fill="none" 
+          stroke="url(#cyanGrad)" 
+          stroke-width="38" 
+          stroke-linecap="round"/>
+          
+    <!-- Interlocking Buddy Loop (Violet Ribbon) -->
+    <path d="M 300,120 C 270,180 230,240 180,280 C 140,312 80,300 80,240 C 80,180 150,140 200,200 C 230,240 250,290 200,320 C 160,350 100,340 100,280" 
+          fill="none" 
+          stroke="url(#violetGrad)" 
+          stroke-width="30" 
+          stroke-linecap="round"/>
+          
+    <!-- Glowing growth arrowhead pointing up and right -->
+    <path d="M 315,90 L 340,165 L 275,145 Z" fill="url(#cyanGrad)"/>
+    
+    <!-- Central intersection spark (white core node) -->
+    <circle cx="200" cy="200" r="14" fill="#ffffff" filter="url(#neonGlow)"/>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+# --- Environment Variables (NEVER commit these) ---
+.env
+.env.local
+.env.production
+.env.staging
+server/.env
+client/.env
+
+# --- Dependencies ---
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# --- Build Output ---
+client/dist/
+client/build/
+
+# --- Logs ---
+*.log
+server/error.log
+server/logs/
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# --- Uploaded Files / Data ---
+server/uploads/
+server/mongodb_data/
+
+# --- Test / Seed Scripts (dev only) ---
+server/seed_*.js
+server/test_*.js
+server/list_users.js
+server/scratch/
+scratch/
+
