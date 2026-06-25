@@ -3,6 +3,15 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  build: {
+    minify: false,
+    cssMinify: false,
+    reportCompressedSize: false,
+    sourcemap: false,
+    rollupOptions: {
+      maxParallelFileOps: 2
+    }
+  },
   plugins: [react(), tailwindcss()],
   server: {
     host: '0.0.0.0',
