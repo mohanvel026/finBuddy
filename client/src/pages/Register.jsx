@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -54,6 +54,18 @@ const Register = () => {
   const navigate                = useNavigate();
   const strength                = getStrength(form.password);
 
+  useEffect(() => {
+    const hadLight = document.documentElement.classList.contains('light');
+    if (hadLight) {
+      document.documentElement.classList.remove('light');
+    }
+    return () => {
+      if (hadLight) {
+        document.documentElement.classList.add('light');
+      }
+    };
+  }, []);
+
   /* Step 1 fields valid? */
   const step1Valid = form.name.trim().length >= 2 && /\S+@\S+\.\S+/.test(form.email) && form.password.length >= 6;
 
@@ -106,7 +118,17 @@ const Register = () => {
           0%   { background-position: -400px 0; }
           100% { background-position: 400px 0; }
         }
-        .reg-card { animation: slide-up-reg 0.55s cubic-bezier(.22,1,.36,1) both; }
+        .reg-card {
+          animation: slide-up-reg 0.55s cubic-bezier(.22,1,.36,1) both;
+          padding: 40px 36px;
+          border-radius: 28px;
+          background: rgba(13, 11, 26, 0.75);
+          border: 1.5px solid rgba(139, 92, 246, 0.25);
+          backdrop-filter: blur(24px);
+          box-shadow: 0 32px 80px rgba(0,0,0,0.65), 0 0 40px rgba(124, 58, 237, 0.05);
+        }
+        @media (max-width: 480px) { .reg-card { padding: 28px 20px; border-radius: 20px; } }
+
         .reg-badge {
           background: rgba(255,255,255,0.04);
           border: 1px solid rgba(255,255,255,0.07);
@@ -118,22 +140,31 @@ const Register = () => {
         }
         .reg-input {
           width: 100%;
-          background: rgba(255,255,255,0.04);
-          border: 1.5px solid rgba(255,255,255,0.08);
+          background: rgba(8, 8, 16, 0.6);
+          border: 1.5px solid rgba(139, 92, 246, 0.2);
           border-radius: 14px;
           padding: 13px 16px;
-          color: #F8FAFC;
+          color: #f8fafc;
           font-size: 14px;
           font-weight: 500;
           outline: none;
           transition: border-color .2s, background .2s, box-shadow .2s;
         }
         .reg-input:focus {
-          border-color: rgba(124,58,237,0.7);
-          background: rgba(124,58,237,0.06);
-          box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+          border-color: rgba(139, 92, 246, 0.85);
+          background: rgba(139, 92, 246, 0.08);
+          box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
         }
-        .reg-input::placeholder { color: rgba(148,163,184,0.4); }
+        .reg-input::placeholder { color: rgba(148, 163, 184, 0.4); }
+        .reg-input:-webkit-autofill,
+        .reg-input:-webkit-autofill:hover,
+        .reg-input:-webkit-autofill:focus,
+        .reg-input:-webkit-autofill:active {
+          -webkit-box-shadow: 0 0 0 1000px #0c0a1a inset !important;
+          -webkit-text-fill-color: #f8fafc !important;
+          transition: background-color 9999s ease-in-out 0s;
+          border-color: rgba(139, 92, 246, 0.5) !important;
+        }
         .reg-select {
           -webkit-appearance: none;
           appearance: none;

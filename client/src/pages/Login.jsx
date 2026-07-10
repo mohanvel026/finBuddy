@@ -37,7 +37,18 @@ const Login = () => {
   const location                      = useLocation();
   const from                          = location.state?.from?.pathname || '/dashboard';
 
-  useEffect(() => { setTimeout(() => setMounted(true), 60); }, []);
+  useEffect(() => {
+    const hadLight = document.documentElement.classList.contains('light');
+    if (hadLight) {
+      document.documentElement.classList.remove('light');
+    }
+    setTimeout(() => setMounted(true), 60);
+    return () => {
+      if (hadLight) {
+        document.documentElement.classList.add('light');
+      }
+    };
+  }, []);
 
   /* OTP digit refs */
   const otpRefs   = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
@@ -252,10 +263,10 @@ const Login = () => {
           z-index: 10;
           padding: 40px 36px;
           border-radius: 28px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          backdrop-filter: blur(20px);
-          box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.06) inset;
+          background: rgba(13, 11, 26, 0.75);
+          border: 1.5px solid rgba(139, 92, 246, 0.25);
+          backdrop-filter: blur(24px);
+          box-shadow: 0 32px 80px rgba(0,0,0,0.65), 0 0 40px rgba(124, 58, 237, 0.05);
         }
         @media (max-width: 480px) { .fb-card { padding: 28px 20px; border-radius: 20px; } }
 
@@ -266,17 +277,17 @@ const Login = () => {
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: rgba(148,163,184,0.7);
+          color: rgba(196, 181, 253, 0.8);
           margin-bottom: 8px;
         }
         .fb-input-wrap { position: relative; }
         .fb-input {
           width: 100%;
           padding: 14px 18px;
-          background: rgba(255,255,255,0.05);
-          border: 1.5px solid rgba(255,255,255,0.09);
+          background: rgba(8, 8, 16, 0.6);
+          border: 1.5px solid rgba(139, 92, 246, 0.2);
           border-radius: 14px;
-          color: #F1F5F9;
+          color: #f8fafc;
           font-size: 14.5px;
           font-weight: 500;
           font-family: 'Inter', sans-serif;
@@ -285,23 +296,21 @@ const Login = () => {
           box-sizing: border-box;
         }
         .fb-input:focus {
-          border-color: rgba(139,92,246,0.65);
-          background: rgba(139,92,246,0.07);
-          box-shadow: 0 0 0 3px rgba(139,92,246,0.15), 0 2px 12px rgba(139,92,246,0.08);
-          animation: fb-pulse-border 2s infinite;
+          border-color: rgba(139, 92, 246, 0.85);
+          background: rgba(139, 92, 246, 0.08);
+          box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), 0 0 20px rgba(139, 92, 246, 0.15);
         }
-        .fb-input::placeholder { color: rgba(100,116,139,0.6); font-weight: 400; }
+        .fb-input::placeholder { color: rgba(148, 163, 184, 0.4); font-weight: 400; }
 
         /* Fix browser autofill white background */
         .fb-input:-webkit-autofill,
         .fb-input:-webkit-autofill:hover,
         .fb-input:-webkit-autofill:focus,
         .fb-input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 1000px #0F0D1C inset !important;
-          -webkit-text-fill-color: #F1F5F9 !important;
-          background-color: #0F0D1C !important;
-          border-color: rgba(139,92,246,0.4) !important;
+          -webkit-box-shadow: 0 0 0 1000px #0c0a1a inset !important;
+          -webkit-text-fill-color: #f8fafc !important;
           transition: background-color 9999s ease-in-out 0s;
+          border-color: rgba(139, 92, 246, 0.5) !important;
         }
 
         /* ── Buttons ── */
@@ -340,8 +349,8 @@ const Login = () => {
           width: 100%;
           display: flex; align-items: center; justify-content: center; gap: 11px;
           padding: 13px 20px;
-          background: rgba(255,255,255,0.04);
-          border: 1.5px solid rgba(255,255,255,0.1);
+          background: rgba(255,255,255,0.03);
+          border: 1.5px solid rgba(255,255,255,0.08);
           border-radius: 14px;
           color: #CBD5E1;
           font-size: 14px;
@@ -352,8 +361,8 @@ const Login = () => {
           letter-spacing: 0.2px;
         }
         .fb-btn-google:hover {
-          background: rgba(255,255,255,0.08);
-          border-color: rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.07);
+          border-color: rgba(255,255,255,0.15);
           transform: translateY(-1px);
           box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }

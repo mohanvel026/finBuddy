@@ -107,7 +107,7 @@ const CountUpValue = ({ end, suffix = "" }) => {
 export const Landing = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const [faqOpenIdx, setFaqOpenIdx] = useState(null);
 
   // Active preview state managers
