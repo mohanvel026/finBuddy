@@ -9,112 +9,15 @@ const marketService = require('../utils/marketService');
 
 const startJobs = () => {
 
-  // ─── Job 1: Debt reminders (runs every day at 9am) ───
-  cron.schedule('0 9 * * *', async () => {
-    console.log('⏰ Running debt reminder job...');
-    try {
-      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  // ─── Job 1: Debt reminders — DISABLED (was spamming users) ───
+  // To re-enable: uncomment the cron.schedule block below
+  // cron.schedule('0 9 * * *', async () => { ... });
 
-      // Find unpaid splits older than 3 days
-      const overdueExpenses = await Expense.find({
-        'splits.isPaid': false,
-        createdAt: { $lte: threeDaysAgo }
-      }).populate('paidBy', 'name email')
-        .populate('splits.user', 'name email notifications');
 
-      for (const expense of overdueExpenses) {
-        for (const split of expense.splits) {
-          if (split.isPaid || !split.user?.email) continue;
+  // ─── Job 2: Weekly financial summary — DISABLED (was spamming users) ───
+  // To re-enable: uncomment the cron.schedule block below
+  // cron.schedule('0 8 * * 1', async () => { ... });
 
-          const daysOld = Math.floor((Date.now() - expense.createdAt) / (1000 * 60 * 60 * 24));
-          if (!split.user.notifications?.email) continue;
-
-          const urgency = daysOld >= 7 ? '🚨 URGENT' : '⏰ Reminder';
-          const message = daysOld >= 7
-            ? `You've owed ₹${split.amount} to ${expense.paidBy?.name} for ${daysOld} days!`
-            : `Friendly reminder: You owe ₹${split.amount} to ${expense.paidBy?.name}`;
-
-          await sendEmail({
-            to: split.user.email,
-            subject: `${urgency}: ₹${split.amount} pending in FinBuddy`,
-            html: `
-              <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;padding:24px;border-radius:12px">
-                <h2 style="color:#00d4ff">💰 FinBuddy</h2>
-                <p>${message}</p>
-                <p><strong>Expense:</strong> ${expense.description}</p>
-                <p><strong>Amount:</strong> ₹${split.amount}</p>
-                <p><strong>Days pending:</strong> ${daysOld} days</p>
-                <a href="${process.env.CLIENT_URL}/split" style="background:#00d4ff;color:#0d0d1a;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px;font-weight:bold">
-                  Settle Now →
-                </a>
-              </div>
-            `
-          });
-        }
-      }
-      console.log(`✅ Debt reminders sent for ${overdueExpenses.length} expenses`);
-    } catch (err) {
-      console.error('Debt reminder job error:', err.message);
-    }
-  });
-
-  // ─── Job 2: Weekly financial summary (runs every Monday at 8am) ───
-  cron.schedule('0 8 * * 1', async () => {
-    console.log('⏰ Running weekly summary job...');
-    try {
-      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-      const users = await User.find({
-        'notifications.email': true,
-        isActive: true
-      });
-
-      for (const user of users) {
-        try {
-          const groups = await Group.find({ 'members.user': user._id });
-          const groupIds = groups.map(g => g._id);
-
-          const weekExpenses = await Expense.find({
-            group: { $in: groupIds },
-            createdAt: { $gte: oneWeekAgo }
-          });
-
-          const totalSpent = weekExpenses
-            .filter(e => e.splits?.some(s => s.user?.toString() === user._id.toString()))
-            .reduce((sum, e) => {
-              const mySplit = e.splits.find(s => s.user?.toString() === user._id.toString());
-              return sum + (mySplit?.amount || 0);
-            }, 0);
-
-          if (totalSpent === 0) continue;
-
-          await sendEmail({
-            to: user.email,
-            subject: '📊 Your FinBuddy Weekly Summary',
-            html: `
-              <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;padding:24px;border-radius:12px">
-                <h2 style="color:#00d4ff">💰 Weekly Summary</h2>
-                <p>Hey ${user.name}! Here's your week in numbers:</p>
-                <div style="background:#1a1a2e;padding:16px;border-radius:8px;margin:16px 0">
-                  <p>💸 <strong>Total spent this week:</strong> ₹${totalSpent.toFixed(0)}</p>
-                  <p>📊 <strong>Groups active:</strong> ${groups.length}</p>
-                  <p>⚡ <strong>Your FinScore:</strong> ${user.finScore}</p>
-                  <p>🔥 <strong>Current streak:</strong> ${user.currentStreak} days</p>
-                </div>
-                <a href="${process.env.CLIENT_URL}/dashboard" style="background:#00d4ff;color:#0d0d1a;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:bold">
-                  View Dashboard →
-                </a>
-              </div>
-            `
-          });
-        } catch (e) { /* skip individual user errors */ }
-      }
-      console.log(`✅ Weekly summaries sent to ${users.length} users`);
-    } catch (err) {
-      console.error('Weekly summary job error:', err.message);
-    }
-  });
 
   // ─── Job 3: Update FinScores daily at midnight ───
   cron.schedule('0 0 * * *', async () => {
