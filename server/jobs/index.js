@@ -14,9 +14,122 @@ const startJobs = () => {
   // cron.schedule('0 9 * * *', async () => { ... });
 
 
-  // ─── Job 2: Weekly financial summary — DISABLED (was spamming users) ───
-  // To re-enable: uncomment the cron.schedule block below
-  // cron.schedule('0 8 * * 1', async () => { ... });
+  // ─── Job 2: Weekly FinBuddy Summary — every Monday at 9am IST ───
+  // Only sends to users who: (1) opted in to email notifications,
+  // (2) have been active in the past 7 days, (3) have actual data to show.
+  cron.schedule('30 3 * * 1', async () => {
+    // 03:30 UTC = 09:00 IST every Monday
+    console.log('⏰ Running weekly summary email job...');
+    let sent = 0;
+    let skipped = 0;
+    try {
+      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+      // Only users who explicitly opted in to email notifications
+      const users = await User.find({
+        'notifications.email': true,
+        isActive: true,
+        lastActiveDate: { $gte: oneWeekAgo } // Only active users this week
+      }).select('name email finScore currentStreak _id');
+
+      for (const user of users) {
+        try {
+          const groups = await Group.find({ 'members.user': user._id });
+          const groupIds = groups.map(g => g._id);
+
+          const weekExpenses = await Expense.find({
+            group: { $in: groupIds },
+            createdAt: { $gte: oneWeekAgo }
+          });
+
+          const totalSpent = weekExpenses
+            .filter(e => e.splits?.some(s => s.user?.toString() === user._id.toString()))
+            .reduce((sum, e) => {
+              const mySplit = e.splits.find(s => s.user?.toString() === user._id.toString());
+              return sum + (mySplit?.amount || 0);
+            }, 0);
+
+          // Skip users with no activity this week
+          if (totalSpent === 0 && groups.length === 0) { skipped++; continue; }
+
+          const clientUrl = process.env.CLIENT_URL || 'https://finbuddy.launchlive.in';
+          const unsubUrl  = `${clientUrl}/profile`; // User can toggle off in Profile > Notifications
+
+          await sendEmail({
+            to: user.email,
+            subject: `📊 Your FinBuddy Weekly Wrap — ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`,
+            html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#08080f;font-family:'Segoe UI',Arial,sans-serif">
+  <div style="max-width:520px;margin:0 auto;padding:32px 16px">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:36px;margin-bottom:4px">💰</div>
+      <h1 style="margin:0;font-size:22px;font-weight:900;background:linear-gradient(135deg,#22d3ee,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">FinBuddy</h1>
+      <p style="margin:6px 0 0;color:#64748b;font-size:13px">Your weekly financial wrap</p>
+    </div>
+
+    <!-- Greeting -->
+    <div style="background:linear-gradient(135deg,rgba(34,211,238,0.08),rgba(129,140,248,0.08));border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px;margin-bottom:16px">
+      <p style="margin:0 0 4px;color:#94a3b8;font-size:13px">Hey ${user.name?.split(' ')[0] || 'there'} 👋</p>
+      <p style="margin:0;color:#e2e8f0;font-size:15px;line-height:1.6">Here's your FinBuddy summary for the week of <strong style="color:#22d3ee">${new Date(oneWeekAgo).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} – ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</strong>.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#22d3ee">₹${(totalSpent || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+        <div style="color:#64748b;font-size:11px;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Week's Split</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#818cf8">${groups.length}</div>
+        <div style="color:#64748b;font-size:11px;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Active Groups</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#f59e0b">${user.finScore || 0}</div>
+        <div style="color:#64748b;font-size:11px;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">FinScore</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#10b981">🔥 ${user.currentStreak || 0}</div>
+        <div style="color:#64748b;font-size:11px;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Day Streak</div>
+      </div>
+    </div>
+
+    <!-- CTA Button -->
+    <div style="text-align:center;margin:24px 0">
+      <a href="${clientUrl}/dashboard" style="display:inline-block;background:linear-gradient(135deg,#22d3ee,#818cf8);color:#08080f;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:900;font-size:14px;letter-spacing:0.3px">
+        View Full Dashboard →
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;border-top:1px solid rgba(255,255,255,0.05);padding-top:20px;margin-top:8px">
+      <p style="margin:0;color:#334155;font-size:11px;line-height:1.8">
+        You're receiving this because you enabled weekly summaries in FinBuddy.<br>
+        <a href="${unsubUrl}" style="color:#22d3ee;text-decoration:none">Unsubscribe</a> · 
+        <a href="${clientUrl}" style="color:#22d3ee;text-decoration:none">Open App</a>
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
+            `
+          });
+          sent++;
+        } catch (e) {
+          console.warn(`Weekly email failed for ${user.email}:`, e.message);
+        }
+      }
+      console.log(`✅ Weekly summary: ${sent} sent, ${skipped} skipped (no activity).`);
+    } catch (err) {
+      console.error('Weekly summary job error:', err.message);
+    }
+  });
+
 
 
   // ─── Job 3: Update FinScores daily at midnight ───
