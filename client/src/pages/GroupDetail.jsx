@@ -74,6 +74,14 @@ const GroupDetail = () => {
   const [activityFeed, setActivityFeed] = useState([]);
   const [activityLoading, setActivityLoading] = useState(false);
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({ title: '', message: '', onConfirm: null, danger: true });
+
+  const showConfirm = (title, message, onConfirm, danger = true) => {
+    setConfirmConfig({ title, message, onConfirm, danger });
+    setShowConfirmModal(true);
+  };
+
   // Expense search & filter
   const [expenseSearch, setExpenseSearch] = useState('');
   const [expenseCategoryFilter, setExpenseCategoryFilter] = useState('all');
@@ -586,16 +594,19 @@ const GroupDetail = () => {
   };
 
   const handleDeleteExpense = async (expenseId) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this expense? All balances will be recalculated.');
-    if (!confirmDelete) return;
-
-    try {
-      await api.delete(`/expenses/${expenseId}`);
-      toast.success('Expense deleted and balances updated! 🗑️');
-      loadGroup();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete expense');
-    }
+    showConfirm(
+      '🗑️ Delete Expense',
+      'Are you sure? All balances will be recalculated and this cannot be undone.',
+      async () => {
+        try {
+          await api.delete(`/expenses/${expenseId}`);
+          toast.success('Expense deleted and balances updated! 🗑️');
+          loadGroup();
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Failed to delete expense');
+        }
+      }
+    );
   };
 
   const handleRaiseDisputePrompt = async (expenseId) => {
@@ -1332,11 +1343,10 @@ const GroupDetail = () => {
               <button onClick={() => setShowAddExpense(true)} className="btn-primary text-xs" style={{ padding: '8px 16px', width: 'auto' }}>+ Add Expense</button>
               {group && user && (group.createdBy?._id || group.createdBy)?.toString() !== user._id?.toString() && (
                 <button
-                  onClick={async () => {
-                    if (!window.confirm('Leave this group?')) return;
+                  onClick={() => showConfirm('🚪 Leave Group', 'Are you sure you want to leave this group? You must settle all debts first.', async () => {
                     try { await api.delete(`/groups/${id}/leave`); toast.success('Left group!'); navigate('/split'); }
                     catch (e) { toast.error(e.response?.data?.message || 'Failed to leave'); }
-                  }}
+                  })}
                   className="text-xs px-3 py-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition cursor-pointer"
                 >🚪 Leave</button>
               )}
@@ -1344,11 +1354,10 @@ const GroupDetail = () => {
                 <>
                   <button onClick={() => { setEditName(group.name); setEditDesc(group.description || ''); setEditEmoji(group.emoji || '👥'); setShowEditModal(true); }}
                     className="btn-secondary text-xs" style={{ padding: '8px 14px', width: 'auto' }}>✏️ Edit</button>
-                  <button onClick={async () => {
-                    if (!window.confirm('Archive this group?')) return;
+                  <button onClick={() => showConfirm('📦 Archive Group', 'Archive this group? Members will still be able to view expenses but cannot add new ones.', async () => {
                     try { await api.delete(`/groups/${id}`); toast.success('Archived!'); navigate('/split'); }
                     catch (e) { toast.error('Failed to archive'); }
-                  }} className="text-xs px-3 py-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition cursor-pointer">🗑️ Archive</button>
+                  })} className="text-xs px-3 py-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition cursor-pointer">🗑️ Archive</button>
                 </>
               )}
             </div>
@@ -1437,7 +1446,7 @@ const GroupDetail = () => {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 border-b border-white/5 overflow-x-auto pb-0">
-          {[['expenses','💸 Expenses'], ['debts','⚖️ Debts'], ['analytics','📊 Analytics'], ['activity','📋 Activity']].map(([tab, label]) => (
+          {[['expenses','💸 Expenses'], ['debts','⚖️ Debts'], ['members','👥 Members'], ['analytics','📊 Analytics'], ['activity','📋 Activity']].map(([tab, label]) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -1576,8 +1585,19 @@ const GroupDetail = () => {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-white text-sm">{exp.description}</p>
-                          <span className="text-[9px] bg-cyan-500/20 text-cyan-400 font-bold px-2 py-0.5 rounded-full border border-cyan-500/25 shrink-0">
-                            {exp.splitType === 'equal' ? '⚖️ Equal' : '🧾 Itemized'}
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
+                            exp.splitType === 'equal' || exp.splitType === 'selective' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/25' :
+                            exp.splitType === 'percentage' ? 'bg-purple-500/20 text-purple-400 border-purple-500/25' :
+                            exp.splitType === 'shares' ? 'bg-orange-500/20 text-orange-400 border-orange-500/25' :
+                            exp.splitType === 'item' || exp.splitType === 'itemized' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/25' :
+                            'bg-slate-500/20 text-slate-400 border-slate-500/25'
+                          }`}>
+                            {exp.splitType === 'equal' ? '⚖️ Equal' :
+                             exp.splitType === 'selective' ? '👥 Selective' :
+                             exp.splitType === 'percentage' ? '% Percent' :
+                             exp.splitType === 'shares' ? '🔢 Shares' :
+                             exp.splitType === 'item' || exp.splitType === 'itemized' ? '🧾 Itemized' :
+                             exp.splitType === 'subgroup' ? '👫 Subgroup' : '⚖️ Equal'}
                           </span>
                         </div>
                         <p className="text-xs text-slate-400 mt-0.5">
@@ -2136,6 +2156,101 @@ const GroupDetail = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Budget Envelopes */}
+        {group?.budgetEnvelopes?.length > 0 && (
+          <div className="mt-6 space-y-3">
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">📬 Budget Envelopes</h3>
+            <div className="grid gap-3">
+              {group.budgetEnvelopes.map((env, i) => {
+                const pct = Math.min(100, Math.round(((env.spentAmount || 0) / (env.budgetAmount || 1)) * 100));
+                const isOver = pct >= 100;
+                const isWarning = pct >= 80;
+                return (
+                  <div key={i} className="card p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-white capitalize">{env.category}</span>
+                      <span className={`text-xs font-bold ${ isOver ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-emerald-400'}`}>
+                        ₹{(env.spentAmount||0).toLocaleString('en-IN')} / ₹{(env.budgetAmount||0).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all ${ isOver ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                        style={{ width: `${pct}%` }} />
+                    </div>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-[10px] text-slate-500">{env.month}/{env.year}</span>
+                      <span className={`text-[10px] font-bold ${ isOver ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-slate-500'}`}>{pct}% used{isOver ? ' ⚠️ Over budget!' : ''}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Members Tab */}
+        {activeTab === 'members' && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">👥 {group?.members?.length} Members</h3>
+              <button onClick={copyInviteCode} className="text-xs px-3 py-1.5 rounded-lg border border-cyan-400/30 text-cyan-400 hover:bg-cyan-500/10 transition cursor-pointer">+ Invite via Code</button>
+            </div>
+            <div className="space-y-2">
+              {group?.members?.map((m, i) => {
+                const memberId = (m.user?._id || m.user)?.toString();
+                const isAdmin = (group.createdBy?._id || group.createdBy)?.toString() === memberId;
+                const memberExpensesPaid = expenses.filter(e => (e.paidBy?._id || e.paidBy)?.toString() === memberId);
+                const totalPaid = memberExpensesPaid.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+                const totalOwed = expenses.reduce((s, e) => {
+                  const split = e.splits?.find(sp => (sp.user?._id || sp.user)?.toString() === memberId);
+                  return s + (Number(split?.amount) || 0);
+                }, 0);
+                const balance = totalPaid - totalOwed;
+                const trust = m.trustScore ?? 100;
+                const trustColor = trust >= 80 ? 'text-emerald-400' : trust >= 60 ? 'text-amber-400' : 'text-red-400';
+                return (
+                  <div key={i} className="card p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-sm font-bold text-white border border-white/10 overflow-hidden shrink-0">
+                        {m.user?.avatar ? <img src={m.user.avatar} alt="" className="w-full h-full object-cover" /> : m.user?.name?.[0]?.toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-white text-sm truncate">{m.user?.name || 'Member'}</p>
+                          {isAdmin && <span className="text-[9px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/25 px-1.5 py-0.5 rounded-full font-bold">ADMIN</span>}
+                          {memberId === user?._id?.toString() && <span className="text-[9px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/25 px-1.5 py-0.5 rounded-full font-bold">YOU</span>}
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-0.5">{m.user?.email || ''}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm font-bold ${balance >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{balance >= 0 ? '+' : ''}₹{Math.abs(balance).toLocaleString('en-IN')}</p>
+                        <p className="text-[9px] text-slate-500">{balance >= 0 ? 'net credit' : 'net owes'}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-3 gap-3 text-center">
+                      <div>
+                        <p className="text-xs font-bold text-white">₹{totalPaid.toLocaleString('en-IN')}</p>
+                        <p className="text-[9px] text-slate-500">Paid</p>
+                      </div>
+                      <div>
+                        <p className={`text-xs font-bold ${trustColor}`}>{trust}%</p>
+                        <p className="text-[9px] text-slate-500">Trust Score</p>
+                        <div className="h-1 bg-white/5 rounded-full mt-1 overflow-hidden">
+                          <div className={`h-full rounded-full ${trust >= 80 ? 'bg-emerald-500' : trust >= 60 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${trust}%` }} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white">{memberExpensesPaid.length}</p>
+                        <p className="text-[9px] text-slate-500">Expenses Added</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -3692,7 +3807,23 @@ const GroupDetail = () => {
 
         <SectionGuide sectionId="/split/group/:id" />
       </main>
-    
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="card w-full max-w-sm animate-fade-in">
+            <h2 className="text-lg font-bold mb-2">{confirmConfig.title}</h2>
+            <p className="text-slate-400 text-sm mb-6">{confirmConfig.message}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowConfirmModal(false)} className="btn-secondary flex-1">Cancel</button>
+              <button
+                onClick={() => { setShowConfirmModal(false); confirmConfig.onConfirm?.(); }}
+                className={`flex-1 py-3 rounded-xl font-bold text-sm transition ${ confirmConfig.danger ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
+              >Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
