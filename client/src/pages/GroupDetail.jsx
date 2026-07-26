@@ -1381,12 +1381,12 @@ const GroupDetail = () => {
           )}
 
           {/* Invite Code Bar */}
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] gap-4">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] flex-wrap gap-2">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-sm">🔗</div>
               <div>
                 <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Invite Code</p>
-                <p className="text-lg font-black tracking-[0.3em] text-cyan-400 font-mono">{group?.inviteCode}</p>
+                <p className="text-lg font-black tracking-widest text-cyan-400 font-mono">{group?.inviteCode}</p>
               </div>
             </div>
             <div className="flex gap-2">

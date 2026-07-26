@@ -252,17 +252,23 @@ const Sidebar = () => {
     };
   }, []);
 
-  /* Delay showing socket error banner by 5s to avoid false-positive flash */
   useEffect(() => {
+    let showTimer;
+    let dismissTimer;
     if (!socketConnected) {
-      const t = setTimeout(() => setShowSocketBanner(true), 5000);
-      return () => { clearTimeout(t); setShowSocketBanner(false); };
+      showTimer = setTimeout(() => {
+        setShowSocketBanner(true);
+        // Auto-dismiss after 8 seconds
+        dismissTimer = setTimeout(() => {
+          setBannerDismissed(true);
+        }, 8000);
+      }, 5000); // 5s grace period before showing
+      return () => { clearTimeout(showTimer); clearTimeout(dismissTimer); setShowSocketBanner(false); };
     } else {
       setShowSocketBanner(false);
       setBannerDismissed(false);
     }
   }, [socketConnected]);
-
 
   // Sync theme to document root
   useEffect(() => {
@@ -541,7 +547,7 @@ const Sidebar = () => {
     <>
       {/* SLEEK CONNECTIVITY BANNER */}
       {(!isOnline || (showSocketBanner && !bannerDismissed)) && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300 w-full max-w-sm px-4">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] animate-in fade-in slide-in-from-top-4 duration-300 w-full max-w-sm px-4">
           <div className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-200 px-4 py-3 rounded-2xl flex items-center gap-3 shadow-[0_8px_32px_rgba(239,68,68,0.15)]">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
             <div className="flex-1 min-w-0">
