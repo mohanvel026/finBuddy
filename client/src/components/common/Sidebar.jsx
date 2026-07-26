@@ -208,8 +208,10 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
-  const [socketConnected, setSocketConnected] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [showSocketBanner, setShowSocketBanner] = useState(false);
 
   useEffect(() => {
     const socket = getSocket();
@@ -249,6 +251,17 @@ const Sidebar = () => {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  /* Delay showing socket error banner by 5s to avoid false-positive flash */
+  useEffect(() => {
+    if (!socketConnected) {
+      const t = setTimeout(() => setShowSocketBanner(true), 5000);
+      return () => { clearTimeout(t); setShowSocketBanner(false); };
+    } else {
+      setShowSocketBanner(false);
+      setBannerDismissed(false);
+    }
+  }, [socketConnected]);
 
 
   // Sync theme to document root
@@ -527,7 +540,7 @@ const Sidebar = () => {
   return (
     <>
       {/* SLEEK CONNECTIVITY BANNER */}
-      {(!isOnline || !socketConnected) && (
+      {(!isOnline || (showSocketBanner && !bannerDismissed)) && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300 w-full max-w-sm px-4">
           <div className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-200 px-4 py-3 rounded-2xl flex items-center gap-3 shadow-[0_8px_32px_rgba(239,68,68,0.15)]">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
@@ -538,9 +551,18 @@ const Sidebar = () => {
               <p className="text-[10px] font-bold text-red-300/80 mt-0.5">
                 {!isOnline 
                   ? 'Please check your internet connection' 
-                  : 'Reconnecting to real-time server...'}
+                  : 'Real-time updates paused. App still works normally.'}
               </p>
             </div>
+            {isOnline && (
+              <button
+                onClick={() => setBannerDismissed(true)}
+                className="text-red-300/60 hover:text-red-200 transition shrink-0 text-base leading-none cursor-pointer"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
       )}

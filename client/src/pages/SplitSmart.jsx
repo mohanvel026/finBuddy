@@ -940,7 +940,7 @@ const SplitSmart = () => {
       {/* Create Group Modal */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md animate-fade-in">
+          <div className="card w-full max-w-md animate-fade-in overflow-x-hidden">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xl font-bold">Create Group</h2>
