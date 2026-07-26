@@ -1,5 +1,5 @@
 // client/src/pages/Profile.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SectionGuide from '../components/common/SectionGuide';
 /* import Sidebar removed */
@@ -593,7 +593,7 @@ const Profile = () => {
     try {
       const res = await api.post(`/profile-features/challenges/${challId}/claim`);
       if (res.data?.success) {
-        toast.success(`Claimed 🪙${res.data.challenge.reward} virtual coins! Outstanding performance! 🏆`);
+        toast.success(`Claimed 🪙${res.data.challenge?.reward || 0} virtual coins! Outstanding performance! 🏆`);
         updateUser({ ...user, virtualCoins: res.data.coinsBalance });
         // Refresh challenges
         const challengesRes = await api.get('/profile-features/challenges');
@@ -703,10 +703,10 @@ const Profile = () => {
     });
 
     scannedBillItems.forEach(item => {
-      const splitCount = item.assignedTo.length;
+      const splitCount = (item.assignedTo || []).length;
       if (splitCount === 0) return;
       const pricePerPerson = item.price / splitCount;
-      item.assignedTo.forEach(person => {
+      (item.assignedTo || []).forEach(person => {
         if (friendTotals[person] !== undefined) {
           friendTotals[person] += pricePerPerson;
         } else {
@@ -930,6 +930,7 @@ const Profile = () => {
         }
       };
 
+      if (!window.Razorpay) { toast.error('Payment gateway not loaded. Please refresh.'); return; }
       const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', function (response) {
         toast.error(`Payment failed: ${response.error.description}`);

@@ -169,7 +169,7 @@ const TripVault = () => {
             </div>
             {stats.isOverBudget && (
               <p className="text-red-400 text-sm mt-2">
-                ⚠️ Over budget by ₹{Math.abs(stats.remaining).toLocaleString('en-IN')}
+                ⚠️ Over budget by ₹{Math.abs(stats.remaining || 0).toLocaleString('en-IN')}
               </p>
             )}
           </div>
@@ -185,7 +185,7 @@ const TripVault = () => {
                   <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                     {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Tooltip formatter={(v) => `₹${v.toFixed(0)}`} contentStyle={{ background: 'var(--bg-secondary)', border: 'none', borderRadius: '8px' }} />
+                  <Tooltip formatter={(v) => `₹${(Number(v) || 0).toFixed(0)}`} contentStyle={{ background: 'var(--bg-secondary)', border: 'none', borderRadius: '8px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -199,7 +199,7 @@ const TripVault = () => {
                 <BarChart data={barData}>
                   <XAxis dataKey="day" tick={{ fill: '#6366F1', fontSize: 11 }} />
                   <YAxis tick={{ fill: '#6366F1', fontSize: 11 }} />
-                  <Tooltip formatter={(v) => `₹${v.toFixed(0)}`} contentStyle={{ background: 'var(--bg-secondary)', border: 'none', borderRadius: '8px' }}  cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+                  <Tooltip formatter={(v) => `₹${(Number(v) || 0).toFixed(0)}`} contentStyle={{ background: 'var(--bg-secondary)', border: 'none', borderRadius: '8px' }}  cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
                   <Bar dataKey="amount" fill="#7C3AED" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -276,7 +276,7 @@ const TripVault = () => {
                     </p>
                   </div>
                 </div>
-                <p className="font-bold">₹{(exp.amountINR || exp.amount).toLocaleString('en-IN')}</p>
+                <p className="font-bold">₹{(exp.amountINR || exp.amount || 0).toLocaleString('en-IN')}</p>
               </div>
             ))}
           </div>

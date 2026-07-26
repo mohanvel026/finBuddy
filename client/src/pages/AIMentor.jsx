@@ -34,7 +34,7 @@ const CustomTooltip = ({ active, payload, label }) => {
               <span className="font-extrabold text-slate-200">
                 {entry.name === "Score"
                   ? entry.value
-                  : "₹" + entry.value.toLocaleString("en-IN")}
+                  : "₹" + (entry.value != null ? entry.value.toLocaleString("en-IN") : "0")}
               </span>
             </div>
           ))}
@@ -186,6 +186,7 @@ const renderMarkdown = (text) => {
 const AIMentor = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [activeTab, setActiveTab] = useState("chat");
 
   useEffect(() => {
     if (location.state?.activeTab) {
@@ -196,7 +197,6 @@ const AIMentor = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("chat");
   
   // Chat Sessions history states
   const [sessions, setSessions] = useState([]);

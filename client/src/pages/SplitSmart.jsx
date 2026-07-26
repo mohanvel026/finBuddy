@@ -86,7 +86,7 @@ const SplitSmart = () => {
     let list = groups.filter(g => showArchived ? g.isArchived : !g.isArchived);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(g => g.name.toLowerCase().includes(q) || g.type?.includes(q));
+      list = list.filter(g => g.name?.toLowerCase().includes(q) || g.type?.includes(q));
     }
     return list;
   }, [groups, searchQuery, showArchived]);

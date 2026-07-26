@@ -237,7 +237,7 @@ const updateExpense = async (req, res) => {
   try {
     const expense = await Expense.findById(req.params.id);
     if (!expense) return res.status(404).json({ success: false, message: 'Expense not found' });
-    if (expense.addedBy.toString() !== req.user._id.toString()) {
+    if (expense.addedBy?.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
     const { description, amount, category, notes } = req.body;
@@ -286,7 +286,12 @@ const updateExpense = async (req, res) => {
       );
     }
 
-    Object.assign(expense, { description, amount, category, notes });
+    const updates = {};
+    if (description !== undefined) updates.description = description;
+    if (amount !== undefined) updates.amount = parseFloat(amount);
+    if (category !== undefined) updates.category = category;
+    if (notes !== undefined) updates.notes = notes;
+    Object.assign(expense, updates);
     await expense.save();
     if (req.body.amount && parseFloat(req.body.amount) !== oldAmount && expense.splits?.length > 0) {
       const newAmountVal = parseFloat(req.body.amount);
@@ -361,10 +366,10 @@ const settleExpense = async (req, res) => {
     const expense = await Expense.findById(expenseId);
     if (!expense) return res.status(404).json({ success: false, message: 'Expense not found' });
     
-    const isCreditor = expense.paidBy.toString() === req.user._id.toString();
+    const isCreditor = expense.paidBy?.toString() === req.user._id.toString();
     const targetUserId = (debtorId && isCreditor) ? debtorId : req.user._id.toString();
 
-    const splitIndex = expense.splits.findIndex(s => s.user.toString() === targetUserId);
+    const splitIndex = expense.splits.findIndex(s => s.user?.toString() === targetUserId);
     if (splitIndex === -1) return res.status(404).json({ success: false, message: 'No split found for this user' });
     
     const method = paymentMethod || 'cash';
@@ -377,6 +382,10 @@ const settleExpense = async (req, res) => {
 
       const payerUser = await User.findById(req.user._id);
       const recipientUser = await User.findById(expense.paidBy);
+      
+      if (!payerUser || !recipientUser) {
+        return res.status(404).json({ success: false, message: 'User not found for settlement' });
+      }
       
       const transferAmount = parseFloat(amount);
       if (payerUser.virtualWallet < transferAmount) {

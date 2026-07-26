@@ -553,7 +553,7 @@ const TradeArena = () => {
       const holdings = portfolio?.portfolio?.holdings || [];
       const { data } = await api.post('/mentor/portfolio-risk', {
         holdings,
-        walletBalance,
+        walletBalance: user?.virtualWallet ?? 0,
         totalInvested: portfolio?.portfolio?.totalInvested || 0,
         currentValue: portfolio?.portfolio?.currentValue || 0
       });
@@ -675,7 +675,7 @@ const TradeArena = () => {
           setJournalTrades(journalRes.trades || []);
           setTradeHistory(journalRes.trades || []);
         }
-        toast.success(`Shorted ${qty} shares of ${selectedStock.symbol} at ₹${selectedStock.price.toFixed(2)}! 📉`);
+        toast.success(`Shorted ${qty} shares of ${selectedStock.symbol} at ₹${(selectedStock.price || 0).toFixed(2)}! 📉`);
         setShowTradeModal(false);
         setTradeForm({ type: 'BUY', quantity: 1, reasoning: '' });
       }
@@ -698,7 +698,7 @@ const TradeArena = () => {
           setTradeHistory(journalRes.trades || []);
         }
         const profitLoss = data.position.profitLoss;
-        toast.success(`Covered short on ${pos.symbol} at ₹${currentPrice.toFixed(2)}! P&L: ₹${profitLoss.toFixed(2)}`);
+        toast.success(`Covered short on ${pos.symbol} at ₹${(currentPrice || 0).toFixed(2)}! P&L: ₹${(profitLoss || 0).toFixed(2)}`);
       }
     } catch (e) {
       toast.error(e.response?.data?.message || 'Failed to cover short position');

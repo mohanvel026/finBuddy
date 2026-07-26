@@ -54,6 +54,78 @@ const QuickAction = ({ icon, label, path }) => (
   </Link>
 );
 
+const WealthLossClock = () => {
+  const [savingsAmount, setSavingsAmount] = useState(100000);
+  const [inflationRate, setInflationRate] = useState(6.0);
+  const [lostAmount, setLostAmount] = useState(0);
+
+  useEffect(() => {
+    setLostAmount(0);
+    const lossPerSecond = (savingsAmount * (inflationRate / 100)) / (365 * 24 * 3600);
+    const intervalMs = 50;
+    const lossPerTick = lossPerSecond * (intervalMs / 1000);
+
+    const timer = setInterval(() => {
+      setLostAmount(prev => prev + lossPerTick);
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [savingsAmount, inflationRate]);
+
+  return (
+    <div className="card border border-rose-500/20 bg-gradient-to-br from-rose-950/10 to-slate-950/20 relative overflow-hidden">
+      <div className="absolute right-3 top-3 text-4xl opacity-10 select-none">⏰</div>
+      <h3 className="font-extrabold text-sm text-white mb-1 flex items-center gap-1.5">
+        📉 Wealth Loss Clock
+      </h3>
+      <p className="text-[10px] text-slate-400 mb-3 leading-relaxed">
+        See how much your idle cash is losing to inflation (6% p.a.) in real-time.
+      </p>
+      
+      {/* Animated Loss Ticker */}
+      <div className="bg-black/35 border border-white/5 rounded-2xl p-3 text-center my-3">
+        <span className="text-[9px] uppercase font-bold tracking-widest text-slate-500 block mb-1">Purchasing Power Lost</span>
+        <div className="text-xl font-mono font-black text-rose-400 tracking-wider">
+          ₹{lostAmount.toFixed(6)}
+        </div>
+        <span className="text-[8px] text-slate-500 block mt-1">Based on ₹{savingsAmount.toLocaleString('en-IN')} idle savings</span>
+      </div>
+
+      {/* Toggles and customization */}
+      <div className="flex items-center justify-between gap-2 border-t border-white/5 pt-3 mt-2">
+        <div className="flex flex-col">
+          <span className="text-[8px] uppercase font-bold text-slate-500">Idle Cash</span>
+          <input
+            type="number"
+            value={savingsAmount}
+            onChange={(e) => setSavingsAmount(Math.max(0, parseInt(e.target.value) || 0))}
+            className="bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] w-20 outline-none text-white focus:border-rose-500/50"
+          />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[8px] uppercase font-bold text-slate-500">Inflation</span>
+          <select
+            value={inflationRate}
+            onChange={(e) => setInflationRate(parseFloat(e.target.value))}
+            className="bg-white/5 border border-white/10 rounded px-1 py-0.5 text-[10px] w-14 outline-none text-white focus:border-rose-500/50"
+            style={{ colorScheme: 'dark' }}
+          >
+            <option value="4.0">4%</option>
+            <option value="6.0">6%</option>
+            <option value="8.0">8%</option>
+            <option value="10.0">10%</option>
+          </select>
+        </div>
+        <Link to="/learn" className="shrink-0">
+          <button className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-rose-350 hover:text-rose-200 transition font-bold text-[9px] cursor-pointer">
+            Beat Inflation 🛡️
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const { user, updateUser } = useAuth();
   const [groups, setGroups] = useState([]);
@@ -267,8 +339,8 @@ const Dashboard = () => {
         api.get('/sip-portfolio')
       ]);
 
-      if (groupsRes.status === 'fulfilled') setGroups(groupsRes.value.data.groups || []);
-      if (trendingRes.status === 'fulfilled') setTrending(trendingRes.value.data.stocks || []);
+      if (groupsRes.status === 'fulfilled') setGroups(groupsRes.value.data?.groups || []);
+      if (trendingRes.status === 'fulfilled') setTrending(trendingRes.value.data?.stocks || []);
 
       const compiled = new Map();
 
@@ -943,9 +1015,9 @@ const Dashboard = () => {
                               />
                             </div>
                             <div className="flex justify-between items-center mt-1 text-[8px] font-semibold">
-                              <span style={{ color: rsiData.color }}>RSI {hold.rsi.toFixed(0)}</span>
+                              <span style={{ color: rsiData.color }}>RSI {(hold.rsi || 0).toFixed(0)}</span>
                               <span className={`text-[8px] font-bold ${hold.isUp ? 'text-green-400' : 'text-red-400'}`}>
-                                {hold.isUp ? '▲' : '▼'}{Math.abs(hold.change).toFixed(2)}%
+                                {hold.isUp ? '▲' : '▼'}{Math.abs(hold.change || 0).toFixed(2)}%
                               </span>
                             </div>
                           </div>
@@ -1019,7 +1091,7 @@ const Dashboard = () => {
                     >
                       <p className="text-[8px] font-black tracking-wide" style={{ color: clr.text }}>{s.name}</p>
                       <p className="text-[9px] font-bold mt-0.5" style={{ color: clr.text }}>
-                        {s.pct >= 0 ? '+' : ''}{s.pct.toFixed(1)}%
+                        {s.pct >= 0 ? '+' : ''}{(s.pct || 0).toFixed(1)}%
                       </p>
                     </div>
                   );
@@ -1198,7 +1270,7 @@ const Dashboard = () => {
                         <div className="text-right">
                           <p className="font-bold text-white font-mono">₹{stock.price?.toFixed(2)}</p>
                           <p className={`text-xs ${stock.isUp ? 'text-green-400' : 'text-red-400'}`}>
-                            {stock.isUp ? '▲' : '▼'} {Math.abs(stock.changePercent)?.toFixed(2)}%
+                            {stock.isUp ? '▲' : '▼'} {Math.abs(stock.changePercent || 0).toFixed(2)}%
                           </p>
                         </div>
                       </div>
@@ -1240,8 +1312,8 @@ const Dashboard = () => {
                           group.myBalance > 0 ? 'text-green-400' :
                           group.myBalance < 0 ? 'text-red-400' : 'text-slate-400'
                         }`}>
-                          {group.myBalance > 0 ? `+₹${group.myBalance.toFixed(0)} owed to you` :
-                           group.myBalance < 0 ? `-₹${Math.abs(group.myBalance).toFixed(0)} you owe` :
+                          {group.myBalance > 0 ? `+₹${(group.myBalance || 0).toFixed(0)} owed to you` :
+                           group.myBalance < 0 ? `-₹${Math.abs(group.myBalance || 0).toFixed(0)} you owe` :
                            '✅ All settled'}
                         </div>
                       </div>
@@ -1311,75 +1383,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-const WealthLossClock = () => {
-  const [savingsAmount, setSavingsAmount] = useState(100000);
-  const [inflationRate, setInflationRate] = useState(6.0);
-  const [lostAmount, setLostAmount] = useState(0);
-
-  useEffect(() => {
-    setLostAmount(0);
-    const lossPerSecond = (savingsAmount * (inflationRate / 100)) / (365 * 24 * 3600);
-    const intervalMs = 50;
-    const lossPerTick = lossPerSecond * (intervalMs / 1000);
-
-    const timer = setInterval(() => {
-      setLostAmount(prev => prev + lossPerTick);
-    }, intervalMs);
-
-    return () => clearInterval(timer);
-  }, [savingsAmount, inflationRate]);
-
-  return (
-    <div className="card border border-rose-500/20 bg-gradient-to-br from-rose-950/10 to-slate-950/20 relative overflow-hidden">
-      <div className="absolute right-3 top-3 text-4xl opacity-10 select-none">⏰</div>
-      <h3 className="font-extrabold text-sm text-white mb-1 flex items-center gap-1.5">
-        📉 Wealth Loss Clock
-      </h3>
-      <p className="text-[10px] text-slate-400 mb-3 leading-relaxed">
-        See how much your idle cash is losing to inflation (6% p.a.) in real-time.
-      </p>
-      
-      {/* Animated Loss Ticker */}
-      <div className="bg-black/35 border border-white/5 rounded-2xl p-3 text-center my-3">
-        <span className="text-[9px] uppercase font-bold tracking-widest text-slate-500 block mb-1">Purchasing Power Lost</span>
-        <div className="text-xl font-mono font-black text-rose-400 tracking-wider">
-          ₹{lostAmount.toFixed(6)}
-        </div>
-        <span className="text-[8px] text-slate-500 block mt-1">Based on ₹{savingsAmount.toLocaleString('en-IN')} idle savings</span>
-      </div>
-
-      {/* Toggles and customization */}
-      <div className="flex items-center justify-between gap-2 border-t border-white/5 pt-3 mt-2">
-        <div className="flex flex-col">
-          <span className="text-[8px] uppercase font-bold text-slate-500">Idle Cash</span>
-          <input
-            type="number"
-            value={savingsAmount}
-            onChange={(e) => setSavingsAmount(Math.max(0, parseInt(e.target.value) || 0))}
-            className="bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] w-20 outline-none text-white focus:border-rose-500/50"
-          />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-[8px] uppercase font-bold text-slate-500">Inflation</span>
-          <select
-            value={inflationRate}
-            onChange={(e) => setInflationRate(parseFloat(e.target.value))}
-            className="bg-white/5 border border-white/10 rounded px-1 py-0.5 text-[10px] w-14 outline-none text-white focus:border-rose-500/50"
-            style={{ colorScheme: 'dark' }}
-          >
-            <option value="4.0">4%</option>
-            <option value="6.0">6%</option>
-            <option value="8.0">8%</option>
-            <option value="10.0">10%</option>
-          </select>
-        </div>
-        <Link to="/learn" className="shrink-0">
-          <button className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-rose-350 hover:text-rose-200 transition font-bold text-[9px] cursor-pointer">
-            Beat Inflation 🛡️
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
-};

@@ -47,7 +47,7 @@ const FinBattle = () => {
       setCurrentLobbyName(lobby.name);
       setCurrentLobbyEmoji(lobby.emoji);
       setLobbyStatus('waiting');
-      const members = lobby.members.map(m => ({
+      const members = (lobby.members || []).map(m => ({
         ...m,
         isMe: m.id === user?._id
       }));
@@ -55,7 +55,7 @@ const FinBattle = () => {
     });
 
     socket.on('lobby:member-update', (lobby) => {
-      const members = lobby.members.map(m => ({
+      const members = (lobby.members || []).map(m => ({
         ...m,
         isMe: m.id === user?._id
       }));
@@ -76,10 +76,10 @@ const FinBattle = () => {
         name: lobby.name,
         emoji: lobby.emoji,
         inviteCode: 'SQUAD' + Math.floor(1000 + Math.random() * 9000),
-        squadFinScore: Math.round(lobby.members.reduce((a, b) => a + b.finScore, 0) / lobby.members.length),
+        squadFinScore: Math.round((lobby.members || []).reduce((a, b) => a + b.finScore, 0) / Math.max(1, (lobby.members || []).length)),
         seasonWins: 0,
         maxMembers: 4,
-        members: lobby.members.map((m, idx) => ({
+        members: (lobby.members || []).map((m, idx) => ({
           user: { name: m.name, finScore: m.finScore, avatar: null },
           role: idx === 0 ? 'captain' : 'member'
         }))
@@ -552,7 +552,7 @@ const FinBattle = () => {
                       return member ? (
                         <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 animate-fade-in">
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center font-bold text-white text-xs">
-                            {member.name[0]}
+                            {member.name?.[0] || '?'}
                           </div>
                           <div className="flex-1">
                             <p className="font-bold text-sm text-white flex items-center gap-2">
@@ -614,7 +614,7 @@ const FinBattle = () => {
                     <button 
                       onClick={() => {
                         const compatibleLobby = activeLobbies.find(
-                          l => l.college === selectedCollege && l.members.length < 4
+                          l => l.college === selectedCollege && (l.members?.length || 0) < 4
                         );
 
                         setSearchingTeam(true);
@@ -690,7 +690,7 @@ const FinBattle = () => {
                             <span className="text-2xl">{lobby.emoji}</span>
                             <div className="flex-1">
                               <h4 className="font-bold text-sm text-white">{lobby.name}</h4>
-                              <p className="text-[10px] text-slate-400">{lobby.college} • {lobby.members.length}/4 members</p>
+                              <p className="text-[10px] text-slate-400">{lobby.college} • {lobby.members?.length || 0}/4 members</p>
                             </div>
                             <button 
                               onClick={() => {
@@ -769,7 +769,7 @@ const FinBattle = () => {
                       <p className="font-medium mb-4">Q{qi + 1}. {q.question}</p>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                        {q.options.map((opt, oi) => {
+                        {q.options?.map((opt, oi) => {
                           const isUserSelected = userAns === oi;
                           const isCorrectOption = correctAns === oi;
                           let btnStyle = 'border-white/10 bg-white/5 text-slate-300';
@@ -808,7 +808,7 @@ const FinBattle = () => {
                     </div>
                     <p className="font-medium mb-4">Q{qi + 1}. {q.question}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {q.options.map((opt, oi) => (
+                      {q.options?.map((opt, oi) => (
                         <button key={oi}
                           onClick={() => setQuizAnswers(prev => ({ ...prev, [q.id]: oi }))}
                           className={`p-3 rounded-xl text-sm text-left transition border ${quizAnswers[q.id] === oi

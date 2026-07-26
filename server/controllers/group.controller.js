@@ -71,8 +71,8 @@ const getGroupById = async (req, res) => {
 
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
-    // Check membership
-    const isMember = group.members.some(m => m.user._id.toString() === req.user._id.toString());
+    // Check membership — use optional chaining in case a member's user doc was deleted
+    const isMember = group.members.some(m => m.user?._id?.toString() === req.user._id.toString());
     if (!isMember) return res.status(403).json({ success: false, message: 'Not a member' });
 
     const expenses = await Expense.find({ group: group._id })
@@ -126,7 +126,7 @@ const updateGroup = async (req, res) => {
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
     const isAdmin = group.members.some(
-      m => m.user.toString() === req.user._id.toString() && m.role === 'admin'
+      m => m.user?.toString() === req.user._id.toString() && m.role === 'admin'
     );
     if (!isAdmin) return res.status(403).json({ success: false, message: 'Admin only' });
 
@@ -149,11 +149,14 @@ const joinGroup = async (req, res) => {
   try {
     const { inviteCode } = req.body;
 
+    if (!inviteCode || typeof inviteCode !== 'string') {
+      return res.status(400).json({ success: false, message: 'Invite code is required' });
+    }
     const group = await Group.findOne({ inviteCode: inviteCode.toUpperCase(), isArchived: false });
     if (!group) return res.status(404).json({ success: false, message: 'Invalid invite code' });
 
     const alreadyMember = group.members.some(
-      m => m.user.toString() === req.user._id.toString()
+      m => m.user?.toString() === req.user._id.toString()
     );
     if (alreadyMember) return res.status(400).json({ success: false, message: 'Already a member' });
 
@@ -179,7 +182,7 @@ const archiveGroup = async (req, res) => {
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
     const isAdmin = group.members.some(
-      m => m.user.toString() === req.user._id.toString() && m.role === 'admin'
+      m => m.user?.toString() === req.user._id.toString() && m.role === 'admin'
     );
     if (!isAdmin) return res.status(403).json({ success: false, message: 'Admin only' });
 
@@ -236,7 +239,8 @@ const getGroupAnalyticsData = async (req, res) => {
   try {
     const { period = '30' } = req.query;
     const daysAgo = new Date();
-    daysAgo.setDate(daysAgo.getDate() - parseInt(period));
+    const parsedPeriod = parseInt(period);
+    daysAgo.setDate(daysAgo.getDate() - (isNaN(parsedPeriod) ? 30 : parsedPeriod));
 
     const expenses = await Expense.find({
       group: req.params.id,
@@ -249,16 +253,16 @@ const getGroupAnalyticsData = async (req, res) => {
     const group = await Group.findById(req.params.id)
       .populate('members.user', 'name avatar');
 
-    const memberSpending = group.members.map(member => {
+    const memberSpending = group ? group.members.filter(m => m.user).map(member => {
       const paid = expenses
-        .filter(e => e.paidBy?._id.toString() === member.user._id.toString())
+        .filter(e => e.paidBy?._id?.toString() === member.user._id.toString())
         .reduce((sum, e) => sum + e.amount, 0);
       return {
         user: member.user,
         amountPaid: paid,
         trustScore: member.trustScore
       };
-    });
+    }) : [];
 
     res.json({
       success: true,
@@ -280,6 +284,7 @@ const setBudgetEnvelope = async (req, res) => {
     const group = await Group.findById(req.params.id);
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
+    if (!group.budgetEnvelopes) group.budgetEnvelopes = [];
     const existingIndex = group.budgetEnvelopes.findIndex(
       e => e.category === category && e.month === month && e.year === year
     );
@@ -302,10 +307,10 @@ const leaveGroup = async (req, res) => {
     const group = await Group.findById(req.params.id);
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
     const memberIndex = group.members.findIndex(
-      m => m.user.toString() === req.user._id.toString()
+      m => m.user?.toString() === req.user._id.toString()
     );
     if (memberIndex === -1) return res.status(400).json({ success: false, message: 'You are not a member of this group' });
-    if (group.createdBy.toString() === req.user._id.toString()) {
+    if (!group.createdBy || group.createdBy.toString() === req.user._id.toString()) {
       return res.status(400).json({ success: false, message: 'As admin, archive the group instead of leaving' });
     }
 
@@ -335,7 +340,7 @@ const getGroupActivity = async (req, res) => {
     const group = await Group.findById(req.params.id);
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
-    const isMember = group.members.some(m => m.user.toString() === req.user._id.toString());
+    const isMember = group.members.some(m => m.user?.toString() === req.user._id.toString());
     if (!isMember) return res.status(403).json({ success: false, message: 'Not a member' });
 
     const expenses = await Expense.find({ group: req.params.id })
@@ -361,7 +366,7 @@ const getGroupActivity = async (req, res) => {
         events.push({
           type: 'settlement',
           icon: '✅',
-          text: `${s.user?.name || 'Someone'} settled ₹${s.amount.toLocaleString('en-IN')} for "${e.description}"`,
+          text: `${s.user?.name || 'Someone'} settled ₹${(s.amount || 0).toLocaleString('en-IN')} for "${e.description}"`,
           actor: s.user,
           timestamp: s.paidAt,
           expenseId: e._id
