@@ -11,9 +11,9 @@ node_modules/
 server/node_modules/
 client/node_modules/
 
-# --- Build Output ---
-client/dist/
-client/build/
+# --- Build Output (committed for LaunchLive deployment) ---
+# client/dist/ — intentionally tracked so LaunchLive serves latest build
+
 
 # --- Logs ---
 *.log
