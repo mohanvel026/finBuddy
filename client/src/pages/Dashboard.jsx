@@ -1347,7 +1347,7 @@ const Dashboard = () => {
 
       {/* Activity Details Modal Popup */}
       {selectedActivity && (
-        <div className="fixed inset-0 z-55 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[55] bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="card w-full max-w-sm space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <div className="flex items-center gap-2">

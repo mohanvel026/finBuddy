@@ -1107,7 +1107,7 @@ const FinBattle = () => {
         {/* Modals */}
         {/* Certificate Modal */}
         {showCertificateModal && (
-          <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-55 p-4 overflow-y-auto backdrop-blur-md animate-fade-in certificate-print-wrap">
+          <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-[55] p-4 overflow-y-auto backdrop-blur-md animate-fade-in certificate-print-wrap">
             <div className="w-full max-w-3xl bg-slate-900 border border-white/10 rounded-3xl p-6 shadow-2xl relative space-y-6 flex flex-col items-center print:border-0 print:bg-white print:text-black print:p-0 print:shadow-none print:my-0">
               
               {/* Close Button & Theme Controllers */}

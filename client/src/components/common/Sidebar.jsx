@@ -577,7 +577,7 @@ const Sidebar = () => {
       </header>
 
       {/* 2. MOBILE OVERLAY DRAWER SIDEBAR */}
-      <div className={`fixed inset-0 z-48 lg:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`fixed inset-0 z-[48] lg:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div onClick={toggleSidebar} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
         
         <aside className={`absolute top-0 left-0 bottom-0 w-72 bg-[var(--bg-secondary)] border-r border-white/5 flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
