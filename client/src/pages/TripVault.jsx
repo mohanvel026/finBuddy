@@ -1,5 +1,6 @@
 // client/src/pages/TripVault.jsx
 import { useState, useEffect } from 'react';
+import LoadingScreen from '../components/common/LoadingScreen';
 import { useParams, Link } from 'react-router-dom';
 import SectionGuide from '../components/common/SectionGuide';
 /* import Sidebar removed */
@@ -32,17 +33,26 @@ const TripVault = () => {
   const loadTrip = async () => {
     try {
       const { data } = await api.get(`/trips/${groupId}`);
+      if (!data?.success || !data?.trip) {
+        toast.error('Trip not found');
+        setLoading(false);
+        return;
+      }
       setTrip(data.trip);
       const td = data.trip.tripDetails || {};
+      const startDate = td.startDate ? td.startDate.split('T')[0] : '';
+      const endDate = td.endDate ? td.endDate.split('T')[0] : '';
       setEditForm({
         destination: td.destination || '',
-        startDate: td.startDate ? td.startDate.split('T')[0] : '',
-        endDate: td.endDate ? td.endDate.split('T')[0] : '',
+        startDate,
+        endDate,
         totalBudget: td.totalBudget || '',
         currency: td.currency || 'INR'
       });
     } catch (e) { toast.error('Failed to load trip'); }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   };
 
   const loadCurrencies = async () => {
@@ -73,11 +83,7 @@ const TripVault = () => {
     } catch (e) { toast.error('Conversion failed'); }
   };
 
-  if (loading) return (
-    <main className="lg:pl-72 flex-1 min-h-full flex items-center justify-center pt-16 lg:pt-0">
-      <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-    </main>
-  );
+  if (loading) return <LoadingScreen message="Loading trip details..." onTimeout={() => setLoading(false)} />;
 
   const stats = trip?.stats || {};
   const pieData = trip?.byCategory

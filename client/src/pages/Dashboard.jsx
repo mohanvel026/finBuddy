@@ -539,8 +539,9 @@ const Dashboard = () => {
 
     } catch (e) {
       console.error('Dashboard loadData failed:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const toggleSpeech = () => {

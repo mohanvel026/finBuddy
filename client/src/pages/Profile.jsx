@@ -747,29 +747,41 @@ const Profile = () => {
 
   const loadBadges = async () => {
     setLoading(true);
+    const t = setTimeout(() => setLoading(false), 5000);
     try {
       const { data } = await api.get('/users/badges');
       setBadges(data.badges || []);
     } catch (e) { }
-    setLoading(false);
+    finally {
+      clearTimeout(t);
+      setLoading(false);
+    }
   };
 
   const loadPersonality = async () => {
     setLoading(true);
+    const t = setTimeout(() => setLoading(false), 5000);
     try {
       const { data } = await api.get('/personality');
       setPersonality(data.result);
     } catch (e) { }
-    setLoading(false);
+    finally {
+      clearTimeout(t);
+      setLoading(false);
+    }
   };
 
   const loadReferral = async () => {
     setLoading(true);
+    const t = setTimeout(() => setLoading(false), 5000);
     try {
       const { data } = await api.get('/users/referral');
       setReferral(data);
     } catch (e) { }
-    setLoading(false);
+    finally {
+      clearTimeout(t);
+      setLoading(false);
+    }
   };
 
   const saveProfile = async (e) => {

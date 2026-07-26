@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { WealthRebalancer } from './smart/WealthRebalancer';
 import { ExpenseSegmentTree } from '../components/common/ExpenseSegmentTree';
 import SectionGuide from '../components/common/SectionGuide';
+import LoadingScreen from '../components/common/LoadingScreen';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, BarChart, Bar, CartesianGrid, Line
@@ -2248,6 +2249,7 @@ const WealthMap = () => {
   useEffect(() => { if (activeTab === 'crypto') loadCryptoPrices(); }, [activeTab]);
 
   const loadData = async () => {
+    const timeout = setTimeout(() => setLoading(false), 12000);
     try {
       // Show page immediately — fetch networth + EMI first (fast), then portfolio in background
       const [nwRes, emiRes] = await Promise.allSettled([
@@ -2257,7 +2259,10 @@ const WealthMap = () => {
       if (nwRes.status === 'fulfilled') setNetWorth(nwRes.value.data);
       if (emiRes.status === 'fulfilled') setEmis(emiRes.value.data.emis || []);
     } catch (e) { toast.error('Failed to load data'); }
-    setLoading(false);       // Unblock the page — SIP portfolio loads in background below
+    finally {
+      clearTimeout(timeout);
+      setLoading(false);       // Unblock the page — SIP portfolio loads in background below
+    }
     loadSIPPortfolio();      // Non-blocking: portfolio section will shimmer until ready
   };
 
@@ -2537,30 +2542,7 @@ const WealthMap = () => {
     />
   );
 
-  if (loading) return (
-    <div className="contents">
-      
-      {/* Sidebar layout */}
-      <main className="lg:pl-72 flex-1 p-4 lg:p-6 pt-20 lg:pt-10 space-y-6">
-        {/* Header skeleton */}
-        <div className="flex justify-between items-center">
-          <div className="space-y-2"><SkeletonCard h="h-8" className="w-48" /><SkeletonCard h="h-4" className="w-64" /></div>
-          <SkeletonCard h="h-9" className="w-36" />
-        </div>
-        {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => <SkeletonCard key={i} h="h-24" />)}
-        </div>
-        {/* Ticker bar */}
-        <SkeletonCard h="h-10" />
-        {/* Main content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 space-y-4"><SkeletonCard h="h-64" /><SkeletonCard h="h-48" /></div>
-          <div className="space-y-4"><SkeletonCard h="h-44" /><SkeletonCard h="h-32" /></div>
-        </div>
-      </main>
-    </div>
-  );
+  if (loading) return <LoadingScreen message="Loading your wealth map..." onTimeout={() => setLoading(false)} />;
 
   return (
     <div className="contents">

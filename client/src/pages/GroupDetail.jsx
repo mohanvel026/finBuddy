@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import SectionGuide from '../components/common/SectionGuide';
+import LoadingScreen from '../components/common/LoadingScreen';
 /* import Sidebar removed */
 import { useAuth } from '../context/AuthContext';
 import { getSocket } from '../services/socket';
@@ -1219,11 +1220,7 @@ const GroupDetail = () => {
     toast.success('Invite code copied!');
   };
 
-  if (loading || !user) return (
-    <main className="lg:pl-72 flex-1 min-h-full flex items-center justify-center pt-16 lg:pt-0">
-      <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-    </main>
-  );
+  if (loading || !user) return <LoadingScreen message="Loading group data..." onTimeout={() => setLoading(false)} />;
 
   const myBalance = group?.members?.find(m => (m.user?._id || m.user)?.toString() === user?._id?.toString())?.balance || 0;
   const myDebts = debts.filter(d => d.from === user?._id?.toString());

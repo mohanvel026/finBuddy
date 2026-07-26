@@ -1,5 +1,6 @@
 // client/src/pages/TradeArena.jsx
 import { useState, useEffect, useRef, useCallback } from 'react';
+import LoadingScreen from '../components/common/LoadingScreen';
 import { Link, useSearchParams } from 'react-router-dom';
 /* import Sidebar removed */
 import { useAuth } from '../context/AuthContext';
@@ -871,8 +872,11 @@ const TradeArena = () => {
       if (shortPositionsRes.status === 'fulfilled') {
         setShortPositions(shortPositionsRes.value.data.positions || []);
       }
-    } catch (e) { }
-    setLoading(false);
+    } catch (e) {
+      console.warn('TradeArena loadInitialData error:', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadPriceHistory = async (symbol, period) => {
@@ -1072,14 +1076,7 @@ const TradeArena = () => {
   const totalNetWorth = walletBalance + currentValue;
   const chartColor = selectedStock?.isUp !== false ? '#7C3AED' : '#ef4444';
 
-  if (loading) return (
-    <main className="lg:pl-72 flex-1 min-h-full flex items-center justify-center pt-20 lg:pt-0">
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-cyan-400">Loading live market data...</p>
-      </div>
-    </main>
-  );
+  if (loading) return <LoadingScreen message="Loading live market data..." timeout={10000} onTimeout={() => setLoading(false)} />;
 
   return (
     <div className="contents">
